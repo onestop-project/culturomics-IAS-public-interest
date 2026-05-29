@@ -1,0 +1,369 @@
+---
+title: "Peak analysis"
+author: "TH"
+format: html
+execute:
+  echo: true
+  warning: false
+  message: false
+  output: false
+editor: visual
+---
+
+# Public interest in invasive alien species
+
+### OneSTOP deliverable 6.1 - corresponding to sub-workflow 1 steps 4-6
+
+## Packages
+
+```{r}
+# Default tidyverse packages
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+library(purrr)
+library(tidyr)
+library(stringr)
+
+# Packages for maps
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(sf)
+
+# Plotting packages
+library(ggpattern)
+library(cowplot)
+library(patchwork)
+
+# Packages for Peak analysis
+library(timetk)
+library(anomalize)
+library(pracma)
+
+
+```
+
+## Loading data
+
+### First the plant data
+
+```{r}
+data <- read.csv("data/data_google_uc.csv", fileEncoding="UTF-8", check.names=FALSE) %>%   select(-species_highlight) %>% 
+  mutate_at(vars(date), ymd)
+```
+
+### Updating dataset with missing data for two species
+
+```{r}
+
+# Read all csv files in the directory data/species
+data_to_add <- list.files("data/species_google_data", pattern = "csv", full.names = T) %>% 
+  map_dfr(function(csv_path){
+    read_csv(csv_path) %>% 
+    pivot_longer(
+      cols = -date,           # Keep date, pivot country columns
+      names_to = "country",
+      values_to = "mentions"
+    ) %>% 
+    mutate(csv_path = csv_path)
+  }) %>% 
+  mutate(species = str_extract(csv_path, "[^/]+$")) %>%
+  mutate_at(vars(species), str_remove, "[.]csv$") %>% 
+  mutate_at(vars(species), str_replace_all, "_", " ") %>%
+  mutate_at(vars(species), str_to_sentence) %>% 
+  mutate_at(vars(date), ymd) %>% 
+  select(-csv_path)
+
+# Combine all data into one
+data <- bind_rows(data, data_to_add)
+
+data %>% 
+  group_by(species, country) %>% 
+  slice_min(date) %>% 
+  write.csv("first_record_species_per_country.csv", row.names = FALSE)
+```
+
+## Step 4: Identifying the 10 species with the highest cumulated public interest
+
+```{r}
+weekly_species_summary <- data %>%
+  group_by(date, species) %>%
+  summarise(total_value = sum(mentions, na.rm = TRUE)) %>%
+  ungroup()
+
+top_species <- weekly_species_summary %>%
+  group_by(species) %>%
+  summarise(total_mentions = sum(total_value, na.rm = TRUE)) %>%
+  slice_max(order_by = total_mentions, n = 10) %>%
+  pull(species)
+
+print(top_species)
+#indicate the species names where it is top 10
+data <- data %>%
+  mutate(species_grouped = if_else(species %in% top_species, as.character(species), "other"))
+
+```
+
+## Step 5: Identify the peaks and anomalies
+
+## Visualizing the species x country trajectories
+
+We are displaying the trajectories for all species but are highlighting the trajectories for the top 10 species by highlighting them in different colors.
+
+```{r}
+colors = c(setNames(RColorBrewer::brewer.pal(length(top_species), "Paired"), top_species), other = "gray70")
+
+ggplot(data, aes(x = date, y = mentions, group = species, color = species_grouped)) + #colour only the most mentioned species 
+  geom_line(linewidth = 1, alpha = 0.8) + 
+  facet_wrap(~country, scales = "free_y") + 
+  scale_color_manual(
+    values = colors,
+    breaks = top_species,
+    name = "Top Species"
+  ) + 
+  scale_y_continuous(labels = scales::comma_format()) +
+  theme_minimal(base_size = 12) + 
+  labs(
+    
+    x = "Date",
+    y = "Searches (Google Health)"
+  ) + 
+  theme(
+    legend.position = "bottom",
+    legend.text = element_text(face = "italic"),
+    strip.text = element_text(face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  ) 
+
+
+```
+
+## Combined identification of peaks and anomalies
+
+Here we identify:
+
+**Peak** - A local maximum in a time series (raw data)
+
+**Anomaly** - A local maximum in a time series after excluding the underlying seasonal and long-term trends from the data.
+
+```{r}
+
+# Make sure to initialize the list fresh every time you run this
+all_results <- list()
+all_anomalies <- list()
+
+# Get unique issue-country combos, filter straight away only for combos containing at least three rows
+
+combos <- data %>% 
+  count(species, country) %>% 
+  filter(n > 2)
+
+for (i in seq_len(nrow(combos))) {
+  sci_name <- combos$species[i]
+  country_name  <- combos$country[i]
+  
+  sub_df <- data %>%
+    filter(species == sci_name,
+           country == country_name) %>%
+    arrange(date)
+  
+#  if (nrow(sub_df) < 3) next
+  
+  results <- sub_df %>%
+    group_by(species, country) %>%
+    time_decompose(mentions, method = "twitter", frequency = "auto", trend = "auto")%>%
+    anomalize(remainder, method = "gesd", alpha = 0.99, max_anoms = 0.01) %>%
+    time_recompose() %>%
+    select(species, country, date, anomaly) %>%
+    ungroup()
+  
+  all_results[[i]] <- results
+  
+  ##! No need to do this per partes - we will do it one ago from the results
+  #Add this block to collect anomalies
+  # flagged <- results %>%
+  #   filter(anomaly == "Yes") %>%
+  #   select(species, country, date)
+  # 
+  # if (nrow(flagged) > 0) {
+  #   all_anomalies[[length(all_anomalies) + 1]] <- flagged
+  # }
+}
+
+# Combine all results, keep all rows (no distinct to preserve all anomalies)
+
+
+df_anomalies <- bind_rows(all_results) %>% 
+  filter(anomaly == "Yes") %>%
+  distinct(species, country, date, anomaly)
+
+
+# Add anomaly column to original df (safe join: 1:1 mapping)
+data_with_anomaly <- data %>%
+  left_join(df_anomalies, by = c("species", "country", "date")) %>%
+  mutate(anomaly = replace_na(anomaly, "No"))
+
+write.csv(data_with_anomaly, "data_with_anomaly.csv", row.names = FALSE)
+```
+
+### Manually remove the lower peaks
+
+We arbitrarily selected the minimum of 400 mentions.
+
+```{r}
+data_with_anomaly_high <- data_with_anomaly %>%
+  mutate(anomaly = if_else(
+    species_grouped != "other" & anomaly == "Yes" & mentions >= 400, "Yes", "No"
+  ))
+```
+
+### Visualize the identified anomalies
+
+```{r}
+ggplot(data_with_anomaly_high, aes(x = date, y = mentions, group = species, color = anomaly)) +
+  #geom_line(alpha = 0.6) +
+  geom_point(size = 1.5) +
+  facet_wrap(~ country, scales = "free_y") +
+  scale_color_manual(values = c("No" = "gray70", "Yes" = "red")) +
+  labs(title = "Google Mentions with Anomalies Highlighted", y = "Mentions", x = "Date") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.text = element_text(face = "bold")
+  )
+```
+
+## Step 6: Identification of peaks in each species x country trajectory
+
+### Identification of the top 10 peaks per country
+
+```{r}
+peaks_df <- data %>%
+  group_by(species, country) %>%
+  group_split() %>%
+  map_dfr(function(data_subset) {
+    data_subset <- arrange(data_subset, date)
+    peaks <- findpeaks(data_subset$mentions)
+    
+    if(!is.null(peaks)) {
+      peak_indices <- peaks[, 2]
+      peak_values <- peaks[, 1]
+      
+      tibble(
+        species = data_subset$species[1],
+        country = data_subset$country[1],
+        date = data_subset$date[peak_indices],
+        peak_height = peak_values
+      )
+    }
+  })
+
+# For each country, keep only the 10 highest peaks
+top10_peaks_per_country <- peaks_df %>%
+  group_by(country) %>%
+  slice_max(order_by = peak_height, n = 10, with_ties = TRUE) %>%
+  arrange(country, desc(peak_height)) %>%
+  ungroup()
+
+#extract result as csv file
+write.csv(top10_peaks_per_country, "updated_top_10_peaks_per_country.csv", row.names = FALSE)
+```
+
+## Step 7: Mapping the distribution of identified anomalies per species
+
+### Preparations
+
+```{r}
+# Load country polygons (scale = "medium" gives good detail)
+world <- ne_countries(scale = "medium", returnclass = "sf")
+
+# Filter to keep only European countries (excluding russia to keep map concise)
+europe <- world %>%
+  filter(region_un == "Europe", iso_a3 != "RUS")
+
+# Roughly: west = -25, east = 45, south = 34, north = 72
+europe_bbox <- st_bbox(c(xmin = -25, xmax = 45, ymin = 32, ymax = 72), crs = st_crs(europe))
+
+europe_mainland <- st_crop(europe, europe_bbox)
+
+eu_countries <- c(
+  "Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus", "Czechia", "Denmark",
+  "Estonia", "Finland", "France", "Germany", "Greece", "Hungary", "Ireland",
+  "Italy", "Latvia", "Lithuania", "Luxembourg", "Malta", "Netherlands",
+  "Poland", "Portugal", "Romania", "Slovakia", "Slovenia", "Spain", "Sweden", "United Kingdom"
+)
+
+europe_mainland <- europe_mainland %>%
+  mutate(is_eu = ifelse(name %in% eu_countries, TRUE, FALSE))
+
+
+```
+
+### Create a map per species
+
+```{r}
+
+# establish color scheme
+anomaly_colors <- c(
+  "0" = "#ffffff",
+  "1" = "#bfe2e2",
+  "2" = "#7fc5c5",
+  "3" = "#3fa8a8",
+  "4" = "#008b8b"   # darkcyan
+)
+
+## Species descriptions
+species_descriptions <- list.files("data/species_descriptions_clean/", full.names = TRUE) %>%
+  map_dfr(read_csv)
+
+peaks_summary <- peaks_df %>%
+  group_by(country) %>%
+  slice_max(peak_height, n = 10) %>%
+  inner_join(data_with_anomaly_high) %>%
+  group_by(species, country) %>%
+  summarise(
+    number_of_anomalies = sum(anomaly == "Yes"),
+    number_of_peaks     = n(),
+    first_date_of_peaks = min(date),
+    last_date_of_peaks  = max(date),
+    .groups = "drop") %>%
+  complete(species, country, fill = list(number_of_anomalies = 0)) %>%
+  mutate(number_of_anomalies = as.factor(number_of_anomalies)) %>%
+  inner_join(species_descriptions)
+
+species_description_plots <- peaks_summary %>%
+  group_split(species) %>%
+  map(function(peaks_summary_subset) {
+    species_name <- unique(peaks_summary_subset$species)
+
+    species_data <- europe_mainland %>%
+      select(name, geometry) %>%
+      inner_join(peaks_summary_subset, by = "name")
+
+    ggplot(species_data) +
+      geom_sf(aes(fill = number_of_anomalies),
+              color = "grey90", linewidth = 0.8,
+              show.legend = TRUE) +                 # <- vynutí všechny úrovně do legendy
+      geom_sf(
+        data = subset(species_data, established == "Yes"),
+        fill = NA, color = "black", linewidth = 1.2,
+        show.legend = FALSE                         # outline jen, do legendy nepatří
+      ) +
+      scale_fill_manual(
+        values = anomaly_colors,
+        drop   = FALSE,                             # <- drží všechny kategorie
+        name   = "# of anomalies"
+      ) +
+      coord_sf(xlim = c(-25, 45), ylim = c(32, 72), expand = FALSE) +
+      theme_minimal() +
+      labs(title = species_name) +
+      theme(plot.title = element_text(size = 14, face = "italic"))
+  })
+
+### Combine plots into one figure
+combined <- wrap_plots(species_description_plots, ncol = 4) +
+  plot_layout(guides = "collect") & theme(legend.position = "bottom")
+combined
+
+```

@@ -1,0 +1,71 @@
+Establishment  Type,Species,Taxa,"Total
+establishments surveyed",Total number establishments found in,"Total percentage 
+establishments found in",Total establishments KEVIN,% of Total KEVIN(197),"Total Number
+Online Retailers found in","Total Number 
+Peer-to-peer found in","Total Percentage
+Online Retailers found in",Total OR KEVIN,% of OR KEVIN(168),"Total Percentage 
+Peer-to-peer found in",Total PP KEVIN,% of P2P KEVIN(29),CZ-OR,CZ-PP,FR-OR,FR-PP,DE-OR,DE-PP,IT-OR,IT-PP,NL-OR,NL-PP,ES-OR,ES-PP,INT-OR
+Pet/Aquarium,Acridotheres tristis,Animal,210,2,0.9524,197,1.0152,0,2,0,168,0,0.9524,29,6.8966,,1,,1,,,,,,,,,
+Pet/Aquarium,Alopochen aegyptiacus,Animal,210,4,1.9048,197,2.0305,1,3,0.4762,168,0.5952,1.4286,29,10.3448,,2,,,,,1,,,1,,,
+Pet/Aquarium,Ameiurus melas,Animal,210,1,0.4762,197,0.5076,1,0,0.4762,168,0.5952,0,29,0,,,,,,,1,,,,,,
+Pet/Aquarium,Ameiurus nebulosus,Animal,210,5,2.381,197,2.5381,5,0,2.381,168,2.9762,0,29,0,,,,,5,,,,,,,,
+Pet/Aquarium,Ameiurus spp.,Animal,210,1,0.4762,197,0.5076,1,0,0.4762,168,0.5952,0,29,0,,,,,,1,,,,,,,
+Pet/Aquarium,Callosciurus finlaysonii,Animal,210,4,1.9048,197,2.0305,1,3,0.4762,168,0.5952,1.4286,29,10.3448,,,,,,1,1,2,,,,,
+Pet/Aquarium,Channa argus,Animal,210,1,0.4762,197,0.5076,0,1,0,168,0,0.4762,29,3.4483,,,,,,1,,,,,,,
+Pet/Aquarium,Fundulus heteroclitus,Animal,210,1,0.4762,197,0.5076,1,0,0.4762,168,0.5952,0,29,0,,,,,,,,,,,1,,
+Pet/Aquarium,Gambusia affinis,Animal,210,6,2.8571,197,3.0457,4,2,1.9048,168,2.381,0.9524,29,6.8966,,,4,,,,,,,,,2,
+Pet/Aquarium,Gambusia holbrooki,Animal,210,2,0.9524,197,1.0152,1,1,0.4762,168,0.5952,0.4762,29,3.4483,,,,,,1,,,,,1,,
+Pet/Aquarium,Gambusia spp.,Animal,210,6,2.8571,197,3.0457,5,1,2.381,168,2.9762,0.4762,29,3.4483,,,,,,,5,1,,,,,
+Pet/Aquarium,Lampropeltis getula,Animal,210,20,9.5238,197,10.1523,12,8,5.7143,168,7.1429,3.8095,29,27.5862,,,2,,,3,,3,5,1,3,1,2
+Pet/Aquarium,Lepomis gibbosus,Animal,210,13,6.1905,197,6.599,6,7,2.8571,168,3.5714,3.3333,29,24.1379,1,4,,,5,2,1,,,,1,,
+Pet/Aquarium,Myocastor coypus,Animal,210,6,2.8571,197,3.0457,0,6,0,168,0,2.8571,29,20.6897,,4,,,,2,,,,,,,
+Pet/Aquarium,Nasua nasua,Animal,210,3,1.4286,197,1.5228,0,3,0,168,0,1.4286,29,10.3448,,3,,,,,,,,,,,
+Pet/Aquarium,Orconectes (Faxonius) limosus,Animal,210,2,0.9524,197,1.0152,1,1,0.4762,168,0.5952,0.4762,29,3.4483,,,,,,,,,,1,1,,
+Pet/Aquarium,Oxyura jamaicensis,Animal,210,1,0.4762,197,0.5076,1,0,0.4762,168,0.5952,0,29,0,,,,,,,1,,,,,,
+Pet/Aquarium,Plotosus lineatus,Animal,210,4,1.9048,197,2.0305,4,0,1.9048,168,2.381,0,29,0,2,,1,,,,,,,,1,,
+Pet/Aquarium,Procambarus clarkii,Animal,210,7,3.3333,197,3.5533,7,0,3.3333,168,4.1667,0,29,0,2,,,,1,,2,,,,2,,
+Pet/Aquarium,Procambarus fallax f. virginalis,Animal,210,7,3.3333,197,3.5533,4,3,1.9048,168,2.381,1.4286,29,10.3448,1,1,1,,,,2,,,1,,1,
+Pet/Aquarium,Procyon lotor,Animal,210,5,2.381,197,2.5381,2,3,0.9524,168,1.1905,1.4286,29,10.3448,,3,,,,1,,,,,,,1
+Pet/Aquarium,Pseudorasbora parva,Animal,210,5,2.381,197,2.5381,3,2,1.4286,168,1.7857,0.9524,29,6.8966,1,2,,,1,,,,,,1,,
+Pet/Aquarium,Pterois miles,Animal,210,7,3.3333,197,3.5533,7,0,3.3333,168,4.1667,0,29,0,,,,,1,,,,2,,1,,3
+Pet/Aquarium,Pycnonotus cafer,Animal,210,2,0.9524,197,1.0152,0,2,0,168,0,0.9524,29,6.8966,,,,,,1,,,,1,,,
+Pet/Aquarium,Sciurus carolinensis,Animal,210,1,0.4762,197,0.5076,1,0,0.4762,168,0.5952,0,29,0,,,,,,,,,,,1,,
+Pet/Aquarium,Solenopsis geminata,Animal,210,1,0.4762,197,0.5076,1,0,0.4762,168,0.5952,0,29,0,,,,,1,,,,,,,,
+Pet/Aquarium,Solenopsis invicta,Animal,210,2,0.9524,197,1.0152,1,1,0.4762,168,0.5952,0.4762,29,3.4483,,,,,,1,,,,,,,1
+Pet/Aquarium,Tamias sibiricus,Animal,210,9,4.2857,197,4.5685,0,9,0,168,0,4.2857,29,31.0345,,5,,1,,,,1,,1,,1,
+Pet/Aquarium,Threskiornis aethiopicus,Animal,210,1,0.4762,197,0.5076,1,0,0.4762,168,0.5952,0,29,0,,,,,,,1,,,,,,
+Pet/Aquarium,Trachemys scripta,Animal,210,15,7.1429,197,7.6142,4,11,1.9048,168,2.381,5.2381,29,37.931,1,5,,2,,2,1,1,,,,1,2
+Pet/Aquarium,Xenopus laevis,Animal,210,13,6.1905,197,6.599,10,3,4.7619,168,5.9524,1.4286,29,10.3448,,,1,1,3,2,4,,1,,,,1
+Horticulture,Acacia saligna,Plant,240,16,6.6667,202,7.9208,14,2,5.8333,183,7.6503,0.8333,19,10.5263,,,1,,1,,9,1,1,,1,1,2
+Horticulture,Ailanthus altissima,Plant,240,26,10.8333,202,12.8713,21,5,8.75,183,11.4754,2.0833,19,26.3158,3,,3,,7,2,8,1,1,,3,2,1
+Both,Alternanthera philoxeroides,Plant,399,1,0.2506,202,0.2571,1,0,0.2506,183,0.2915,0,19,0,,,,,,,,,,,1,,
+Horticulture,Andropogon virginicus,Plant,240,1,0.4167,202,0.495,1,0,0.4167,183,0.5464,0,19,0,,,,,,,1,,,,,,
+Horticulture,Asclepias syriaca,Plant,240,26,10.8333,202,12.8713,19,7,7.9167,183,10.3825,2.9167,19,36.8421,5,1,5,1,3,2,2,1,1,1,1,1,2
+Horticulture,Baccharis halimifolia,Plant,240,7,2.9167,202,3.4653,7,0,2.9167,183,3.8251,0,19,0,,,5,,1,,1,,,,,,
+Both,Cabomba caroliniana,Plant,399,19,4.7619,202,4.8843,15,4,3.7594,183,4.3732,1.0025,19,8.6957,,,2,1,1,,6,1,3,,1,2,2
+Horticulture,Cardiospermum grandiflorum,Plant,240,2,0.8333,202,0.9901,1,1,0.4167,183,0.5464,0.4167,19,5.2632,,,,,1,1,,,,,,,
+Horticulture,Celastrus orbiculatus,Plant,240,31,12.9167,202,15.3465,30,1,12.5,183,16.3934,0.4167,19,5.2632,1,,4,,10,,4,,8,,1,1,2
+Horticulture,Cortaderia jubata,Plant,240,1,0.4167,202,0.495,1,0,0.4167,183,0.5464,0,19,0,,,,,,,,,,,,,1
+Both,Eichhornia crassipes,Plant,399,39,9.7744,202,10.0257,31,8,7.7694,183,9.0379,2.005,19,17.3913,2,1,5,2,4,1,17,1,,2,1,1,2
+Both,Elodea nuttallii,Plant,399,5,1.2531,202,1.2853,2,3,0.5013,183,0.5831,0.7519,19,6.5217,,,,,1,,,,1,2,,1,
+Horticulture,Gunnera tinctoria,Plant,240,16,6.6667,202,7.9208,12,4,5,183,6.5574,1.6667,19,21.0526,,1,2,,4,1,,1,4,1,1,,1
+Both,Gymnocoronis spilanthoides,Plant,399,19,4.7619,202,4.8843,16,3,4.01,183,4.6647,0.7519,19,6.5217,2,,4,,4,1,2,,1,1,2,1,1
+Horticulture,Heracleum mantegazzianum,Plant,240,1,0.4167,202,0.495,0,1,0,183,0,0.4167,19,5.2632,,,,,,,,,,1,,,
+Horticulture,Humulus scandens,Plant,240,11,4.5833,202,5.4455,10,1,4.1667,183,5.4645,0.4167,19,5.2632,5,,1,1,1,,1,,1,,1,,
+Both,Hydrocotyle ranunculoides,Plant,399,1,0.2506,202,0.2571,1,0,0.2506,183,0.2915,0,19,0,,,,,,,,,,,1,,
+Horticulture,Impatiens glandulifera,Plant,240,4,1.6667,202,1.9802,0,4,0,183,0,1.6667,19,21.0526,,,,2,,1,,,,,,1,
+Horticulture,Koenigia polystachya,Plant,240,1,0.4167,202,0.495,1,0,0.4167,183,0.5464,0,19,0,,,1,,,,,,,,,,
+Both,Lagarosiphon major,Plant,399,4,1.0025,202,1.0283,3,1,0.7519,183,0.8746,0.2506,19,2.1739,,,1,,1,,1,1,,,,,
+Horticulture,Lespedeza cuneata,Plant,240,2,0.8333,202,0.9901,0,2,0,183,0,0.8333,19,10.5263,,,,,,,,1,,,,1,
+Both,Ludwigia peploides,Plant,399,1,0.2506,202,0.2571,1,0,0.2506,183,0.2915,0,19,0,,,,,,,1,,,,,,
+Horticulture,Lygodium japonicum,Plant,240,2,0.8333,202,0.9901,1,1,0.4167,183,0.5464,0.4167,19,5.2632,,,,,,,1,,,1,,,
+Horticulture,Lysichiton americanus,Plant,240,6,2.5,202,2.9703,5,1,2.0833,183,2.7322,0.4167,19,5.2632,,,,,4,,1,,,1,,,
+Both,Myriophyllum aquaticum,Plant,399,42,10.5263,202,10.7969,33,9,8.2707,183,9.621,2.2556,19,19.5652,3,,4,2,9,1,9,2,6,2,2,2,
+Both,Myriophyllum heterophyllum,Plant,399,7,1.7544,202,1.7995,7,0,1.7544,183,2.0408,0,19,0,1,,2,,,,2,,2,,,,
+Horticulture,Pennisetum setaceum,Plant,240,33,13.75,202,16.3366,30,3,12.5,183,16.3934,1.25,19,15.7895,2,,7,,9,1,6,1,2,,1,1,3
+Horticulture,Phytolacca americana,Plant,240,20,8.3333,202,9.901,16,4,6.6667,183,8.7432,1.6667,19,21.0526,,,1,,5,3,3,1,2,,1,,4
+Both,Pistia stratiotes,Plant,399,92,23.0576,202,23.6504,78,14,19.5489,183,22.7405,3.5088,19,30.4348,4,1,10,6,30,4,21,2,9,1,1,,3
+Horticulture,Prosopis juliflora,Plant,240,6,2.5,202,2.9703,4,2,1.6667,183,2.1858,0.8333,19,10.5263,,,,,2,,1,1,,,,1,1
+Horticulture,Pueraria lobata (montana),Plant,240,7,2.9167,202,3.4653,5,2,2.0833,183,2.7322,0.8333,19,10.5263,,,1,,3,1,1,1,,,,,
+Both,Salvinia molesta,Plant,399,9,2.2556,202,2.3136,5,4,1.2531,183,1.4577,1.0025,19,8.6957,,,,1,1,,1,1,3,1,,1,
+Horticulture,Triadica sebifera,Plant,240,12,5,202,5.9406,9,3,3.75,183,4.918,1.25,19,15.7895,,,2,,3,1,1,1,,,1,1,2
