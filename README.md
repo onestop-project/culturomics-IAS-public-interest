@@ -1,6 +1,6 @@
 ## Repeatable workflow culturomics
 
-Copyright (C) 2026 Theresa Henke, Ana Novoa https://onestop-project.eu/
+Copyright (C) 2026 Theresa Henke, Pavel Pipek, Ana Novoa https://onestop-project.eu/
 
 A repeatable workflow has been developed as part of the Horizon Europe project OneSTOP (One Biosecurity Systems and Technology for People, Places, and Pathways) to address the human dimensions of biological invasions. Specifically, the developed workflow aims to i) assess public interest in Invasive Alien Species (IAS), and ii) analyze the presence and dynamics of IAS in e-commerce as a proxy for potential introduction pathways.
 
