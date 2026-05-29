@@ -13,6 +13,8 @@ editor: visual
 
 # IAS presence in e-commerce establishments
 
+### OneSTOP deliverable 6.1 - corresponding to sub-workflow 2 step 4
+
 ### Packages
 
 ```{r}
@@ -47,16 +49,16 @@ clean_species <- function(x){
 ## Loading data
 
 ```{r}
-species.2021 <- read.csv("data/species_list_2021.csv")
-species.2024 <- read.csv("data/species_list_2024.csv")
+species.2021 <- read.csv("species_list_2021.csv")
+species.2024 <- read.csv("species_list_2024.csv")
 
 # Trading records
-unique.records.2021 <- read.csv("data/unique_records_2021.csv") %>% 
+unique.records.2021 <- read.csv("unique_records_2021.csv") %>% 
   rename_with(tolower) %>% 
   select(species, platform, kingdom, country) %>% 
   mutate(year = "2021")
 
-unique.records.2024 <- read.csv("data/unique_records_2024.csv") %>% 
+unique.records.2024 <- read.csv("unique_records_2024.csv") %>% 
   rename_with(tolower) %>% 
   select(species, platform, kingdom, country) %>% 
   mutate(year = "2024")
@@ -71,7 +73,7 @@ surveyed.in.2021 <- unique.records.2021 %>%
   unique()
 
 # traded species in 2021
-traded.in.2021 <- read.csv("data/results_2021.csv") %>% 
+traded.in.2021 <- read.csv("results_2021.csv") %>% 
   pull("Species") %>%
   clean_species() %>% 
   unique()
@@ -83,7 +85,7 @@ surveyed.in.2024 <- unique.records.2024 %>%
   unique()
 
 # traded species in 2024
-traded.in.2024 <- read.csv("data/results_2024.csv") %>% 
+traded.in.2024 <- read.csv("results_2024.csv") %>% 
   filter(Total.number.establishments.found.in > 0) %>% 
   pull("Species") %>% 
   clean_species() %>% 
@@ -139,7 +141,7 @@ species.combined <- species.2024.sel %>%
 
 The classification takes into account the species' status in 2021 and 2024 as well as whether it was considered for analysis in 2021.
 
-This results in the following 7 classifications based on the decision tree: Included in 2021? (Yes/No) - Status 2021? (NA/Proposed/Union concern) - Found in trade in 2021? (NA/No/Yes) - Status 2024? (Proposed/Union concern) - Found in trade in 2024? (No/Yes) (**Please note:** 4 species are classified as "Union concern delayed to 2024/2027" but were considered as listed on the Union concern list for the analysis; all were persistent-proposed)
+This results in the following 11 classifications (10 present in presented data) based on the decision tree: Included in 2021? (Yes/No) - Status 2021? (NA/Proposed/Union concern) - Found in trade in 2021? (NA/No/Yes) - Status 2024? (Proposed/Union concern) - Found in trade in 2024? (No/Yes) (**Please note:** 4 species are classified as "Union concern delayed to 2024/2027" but were considered as listed on the Union concern list for the analysis; all were persistent-proposed)
 
 **Entry - New:** Species was not included in 2021 survey but was listed included as a proposed IAS in 2024 and found in trade
 
@@ -155,85 +157,146 @@ This results in the following 7 classifications based on the decision tree: Incl
 
 **Exit - Listed:** Species was categorized as listed IAS in both surveys but was identified in at least one establishment only in 2021.
 
+**Discontinued - Proposed:** Species was categorized as proposed IAS and found in trade in 2021 but was not included in the 2024 survey.
+
+**No trade - New:** Species was only included as proposed IAS in 2024 but was not found in trade.
+
+**No trade - Proposed:** Species was categorized as proposed IAS in 2021 and listed IAS in 2024 but was not found in trade in either year.
+
+**No trade - Listed:** Species was categorized as listed IAS in 2021 and 2024 but was not found in trade in either year.
+
 ```{r}
 species.classified <- species.combined %>%
   mutate(
     category = case_when(
-      # Species was traded in both years
-      found.in.trade.2021 == "Yes" & found.in.trade.2024 == "Yes" ~ if_else(
-        status.2021 == "Proposed", "Persistent - Proposed","Persistent - Listed"
+
+      # Species traded in both years
+      found.in.trade.2021 == "Yes" &
+      found.in.trade.2024 == "Yes" ~ if_else(
+        status.2021 == "Proposed",
+        "Persistent - Proposed",
+        "Persistent - Listed"
       ),
-      
-      # Species was traded just in 2024
-      found.in.trade.2021 == "No" & found.in.trade.2024 == "Yes" ~ case_when(
-        # Species was not surveyed in 2021
+
+      # Species traded only in 2024
+      found.in.trade.2021 == "No" &
+      found.in.trade.2024 == "Yes" ~ case_when(
+
+        # Species not surveyed in 2021
         is.na(status.2021) ~ "Entry - New",
-        
-        # Species was surveyed in 2021 as proposed
-        status.2021 == "Proposed" ~ "Entry - Proposed",
-        
-        # Species was surveyed in 2021 as union concern
-        status.2021 == "Union concern" ~ "Entry - Listed",
-      ), 
-      
-      # Species was traded just in 2021
-      found.in.trade.2021 == "Yes" & found.in.trade.2024 == "No" ~ case_when(
-        # Species was surveyed as proposed in 2021
-        status.2021 == "Proposed" ~ if_else(is.na(status.2024), "Exit - New", "Exit - Proposed"),
-        
-        # Species was surveyed as union concern in 2021
+
+        # Species surveyed as union concern in 2021
+        status.2021 == "Union concern" ~ "Entry - Listed"
+      ),
+
+      # Species traded only in 2021
+      found.in.trade.2021 == "Yes" &
+      found.in.trade.2024 == "No" ~ case_when(
+
+        # Proposed in 2021 and absent in 2024
+        status.2021 == "Proposed" &
+        is.na(status.2024) ~ "Discontinued - Proposed",
+
+        # Proposed in 2021 and still present in 2024
+        status.2021 == "Proposed" ~ "Exit - Proposed",
+
+        # Union concern in 2021
         status.2021 == "Union concern" ~ "Exit - Listed"
-      ), 
-  
-      TRUE ~ "No trade")) %>% 
-  # Convert category to factor with specified order
-  mutate(across(category, ~factor(.x, levels = c(
-    "Entry - New", "Entry - Proposed", "Entry - Listed",
-    "Persistent - Proposed", "Persistent - Listed",
-    "Exit - Proposed", "Exit - Listed", "Exit - New", "No trade"
-  ))))
+      ),
+
+      # No trade in either year
+      found.in.trade.2021 == "No" &
+      found.in.trade.2024 == "No" ~ case_when(
+
+        is.na(status.2021) &
+        status.2024 == "Proposed" ~ "No trade - New",
+
+        status.2021 == "Proposed" &
+        status.2024 == "Union concern" ~ "No trade - Proposed",
+
+        status.2021 == "Union concern" &
+        status.2024 == "Union concern" ~ "No trade - Listed"
+      ),
+
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  mutate(
+    category = factor(
+      category,
+      levels = c(
+        "Entry - New",
+        "Entry - Listed",
+        "Persistent - Proposed",
+        "Persistent - Listed",
+        "Exit - Proposed",
+        "Exit - Listed",
+        "Discontinued - Proposed",
+        "No trade - New",
+        "No trade - Proposed",
+        "No trade - Listed"
+      )
+    )
+
 ```
 
 ### Visualization of species classification
 
 ```{r}
-
-#create counts to include all categories in graph
+# Create counts and include all categories in graph
 plot_data <- species.classified %>%
-  count(category, kingdom) %>% 
+  count(category, kingdom) %>%
   complete(category, kingdom, fill = list(n = 0))
 
-#defining base colors for categories
+# Define colors for updated categories
 base_colors <- c(
   "Entry - New" = "#1b9e77",
-  "Entry - Proposed" = "#66c2a5",
   "Entry - Listed" = "#a6dba0",
+
   "Persistent - Proposed" = "#ffd92f",
   "Persistent - Listed" = "#e6ab02",
+
   "Exit - Proposed" = "#377eb8",
   "Exit - Listed" = "#74add1",
-  "Exit - New" = "red",
-  "No trade" = "grey"
+
+  "Discontinued - Proposed" = "#d73027",
+
+  "No trade - New" = "#d9d9d9",
+  "No trade - Proposed" = "#969696",
+  "No trade - Listed" = "#525252"
 )
 
-#grah the data, indicating the differences between plants & animals with differences in alpha; adding count numbers to graph
-ggplot(plot_data, aes(x = category, y = n, fill = category)) +
+# Graph the data and display counts
+ggplot(plot_data,
+       aes(x = category,
+           y = n,
+           fill = category)) +
+
   geom_col(position = "stack") +
+
   geom_text(
     aes(label = n),
     position = position_stack(vjust = 0.5),
     size = 3
   ) +
+
   coord_flip() +
-  scale_fill_manual(values = base_colors, drop = FALSE,
-                    name = "Classification") +
+
+  scale_fill_manual(
+    values = base_colors,
+    drop = FALSE,
+    name = "Classification"
+  ) +
+
   theme_minimal() +
+
   labs(
     title = "Species Classification",
     x = "Category",
     y = "Count"
   ) +
-  facet_wrap(.~kingdom)
+
+  facet_wrap(~ kingdom)
 
 ```
 
