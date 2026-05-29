@@ -149,9 +149,6 @@ Here we identify:
 
 ```{r}
 
-if(FALSE){
-  
-
 # Make sure to initialize the list fresh every time you run this
 all_results <- list()
 all_anomalies <- list()
@@ -162,17 +159,13 @@ combos <- data %>%
   count(species, country) %>% 
   filter(n > 2)
 
-##! I made this during loading of the data, no need to do it now
-# Data$date <- as.Date(Data$date)
-# is.Date(Data$date)
-
 for (i in seq_len(nrow(combos))) {
   sci_name <- combos$species[i]
-  country  <- combos$country[i]
+  country_name  <- combos$country[i]
   
   sub_df <- data %>%
     filter(species == sci_name,
-           country == country) %>%
+           country == country_name) %>%
     arrange(date)
   
 #  if (nrow(sub_df) < 3) next
@@ -206,11 +199,6 @@ df_anomalies <- bind_rows(all_results) %>%
   distinct(species, country, date, anomaly)
 
 
-} else {
-  df_anomalies <- read_csv("df_anomalies.csv")
-}
-
-
 # Add anomaly column to original df (safe join: 1:1 mapping)
 data_with_anomaly <- data %>%
   left_join(df_anomalies, by = c("species", "country", "date")) %>%
@@ -226,16 +214,13 @@ We arbitrarily selected the minimum of 400 mentions.
 ```{r}
 data_with_anomaly_high <- data_with_anomaly %>%
   mutate(anomaly = if_else(
-    species_grouped != "Other" & anomaly == "Yes" & mentions >= 400, "Yes", "No"
+    species_grouped != "other" & anomaly == "Yes" & mentions >= 400, "Yes", "No"
   ))
 ```
 
 ### Visualize the identified anomalies
 
 ```{r}
-##! I have done this at the very beginning
-#data_with_anomaly_high$date <- as.Date(Data_with_anomaly_high$date)
-
 ggplot(data_with_anomaly_high, aes(x = date, y = mentions, group = species, color = anomaly)) +
   #geom_line(alpha = 0.6) +
   geom_point(size = 1.5) +
@@ -249,7 +234,43 @@ ggplot(data_with_anomaly_high, aes(x = date, y = mentions, group = species, colo
   )
 ```
 
-## Mapping the distribution of identified anomalies per species
+## Step 6: Identification of peaks in each species x country trajectory
+
+### Identification of the top 10 peaks per country
+
+```{r}
+peaks_df <- data %>%
+  group_by(species, country) %>%
+  group_split() %>%
+  map_dfr(function(data_subset) {
+    data_subset <- arrange(data_subset, date)
+    peaks <- findpeaks(data_subset$mentions)
+    
+    if(!is.null(peaks)) {
+      peak_indices <- peaks[, 2]
+      peak_values <- peaks[, 1]
+      
+      tibble(
+        species = data_subset$species[1],
+        country = data_subset$country[1],
+        date = data_subset$date[peak_indices],
+        peak_height = peak_values
+      )
+    }
+  })
+
+# For each country, keep only the 10 highest peaks
+top10_peaks_per_country <- peaks_df %>%
+  group_by(country) %>%
+  slice_max(order_by = peak_height, n = 10, with_ties = TRUE) %>%
+  arrange(country, desc(peak_height)) %>%
+  ungroup()
+
+#extract result as csv file
+write.csv(top10_peaks_per_country, "updated_top_10_peaks_per_country.csv", row.names = FALSE)
+```
+
+## Step 7: Mapping the distribution of identified anomalies per species
 
 ### Preparations
 
@@ -344,42 +365,5 @@ species_description_plots <- peaks_summary %>%
 combined <- wrap_plots(species_description_plots, ncol = 4) +
   plot_layout(guides = "collect") & theme(legend.position = "bottom")
 combined
-
-```
-
-## Step 6: Identification of peaks in each species x country trajectory
-
-### Identification of the top 10 peaks per country
-
-```{r}
-peaks_df <- data %>%
-  group_by(species, country) %>%
-  group_split() %>%
-  map_dfr(function(data_subset) {
-    peaks <- findpeaks(data_subset$mentions)
-    
-    if(!is.null(peaks)) {
-      peak_indices <- peaks[, 2]
-      peak_values <- peaks[, 1]
-      
-      tibble(
-        species = data_subset$species[1],
-        country = data_subset$country[1],
-        date = data_subset$date[peak_indices],
-        peak_height = peak_values
-      )
-    }
-  })
-
-# For each country, keep only the 10 highest peaks
-top10_peaks_per_country <- peaks_df %>%
-  group_by(country) %>%
-  # You cannot set with_ties to FALSE - how would you decide which of the peaks is more important than the other? This is a potential source of systematic error - if you want to take just one, than it should be by random, not by order.
-  slice_max(order_by = peak_height, n = 10, with_ties = TRUE) %>%
-  arrange(country, desc(peak_height)) %>%
-  ungroup()
-
-#extract result as csv file
-write.csv(top10_peaks_per_country, "updated_top_10_peaks_per_country.csv", row.names = FALSE)
 
 ```
