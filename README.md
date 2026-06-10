@@ -9,5 +9,3 @@ The workflow is showcased on the basis of two case studies. In case study 1, we 
 In case study 2, we assessed the presence of IAS listed on or proposed for the Union List in e-commerce. Online retailers, peer-to-peer trading platforms, and two common e-commerce platforms, were surveyed in 6 EU member states (Czech Republic, France, Germany, Italy, the Netherlands, Spain) in 2021 and 2024.
 
 Both the workflow and associated R codes are available in this repository.
-
-This repository is still a work in progress.
