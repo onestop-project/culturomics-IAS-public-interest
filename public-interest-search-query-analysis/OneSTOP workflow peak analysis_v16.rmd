@@ -1,13 +1,17 @@
 ---
 title: "Peak analysis"
-author: "TH"
-format: html
+author: Theresa Henke
+date: 10/06/2026
+execute-dir: file
 execute:
   echo: true
   warning: false
   message: false
-  output: false
+  output: true
 editor: visual
+output: 
+  rmarkdown::github_document:
+    toc: true
 ---
 
 # Public interest in invasive alien species
